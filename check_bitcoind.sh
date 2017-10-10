@@ -68,7 +68,7 @@ if [ -z "$crit_level" ]; then
 fi
 
 if [ -z "$checktype" ]; then
-	echo "UNKNOWN - Must specify a check to perform (blockchain/connections)"
+	echo "UNKNOWN - Must specify a check to perform (blockchain/connections/errors)"
 	exit 3
 fi
 
@@ -151,6 +151,17 @@ case $checktype in
 		else
 			echo "UNKNOWN - $output"
 			exit 3
+		fi
+		;;
+
+	"errors")
+		node_errors=$(echo "$node" | jq -r '.result.errors')
+		if [ -z "$node_errors" ]; then
+			echo "OK"
+			exit 0
+		else
+			echo "CRITICAL - $node_errors"
+			exit 2
 		fi
 		;;
 
