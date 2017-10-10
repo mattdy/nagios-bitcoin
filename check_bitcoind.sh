@@ -44,7 +44,6 @@ while getopts ":BH:P:w:c:u:p:t:" opt; do
 		:)
 			echo "UNKNOWN - Option $OPTARG requires an argument" >&2
 			exit 3
-			;;
 		;;
 	esac
 done
