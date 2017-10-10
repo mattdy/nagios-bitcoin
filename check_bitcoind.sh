@@ -119,7 +119,7 @@ case $checktype in
 		remote_blocks=$(echo "$remote" | jq -r '.info.blocks')
 
 		diff=$(expr $remote_blocks - $node_blocks)
-		output="node block height = $node_blocks, global block height = $remote_blocks|node=$node_blocks,global=$remote_blocks"
+		output="node block height = $node_blocks, global block height = $remote_blocks|node=$node_blocks, global=$remote_blocks"
 
 		if [ "$diff" -lt "$warn_level" ]; then
 			echo "OK - $output"
