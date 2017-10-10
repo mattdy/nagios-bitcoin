@@ -10,11 +10,12 @@
 # Some inspiration from https://github.com/daniel-lucio/ethereum-nagios-plugins
 
 use_bch=False
+coin="btc" # Default to BTC if not specified
 
-while getopts ":BH:P:w:c:u:p:t:" opt; do
+while getopts ":B:H:P:w:c:u:p:t:" opt; do
 	case $opt in
 		B)
-			use_bch=True
+			coin=$OPTARG
 			;;
 		H)
 			node_address=$OPTARG
@@ -81,6 +82,11 @@ if [ -z "$node_pass" ]; then
 	exit 3
 fi
 
+if [ "$coin" != "btc" ] && [ "$coin" != "bch" ]; then
+	echo "UNKNOWN - Invalid coin type specified (btc/bch)"
+	exit 3
+fi
+
 # Get information from node
 node=$(curl --user $node_user:$node_pass -sf --data-binary '{"jsonrpc": "1.0", "id":"check_btc_blockchain", "method": "getinfo", "params": [] }' -H 'content-type: text/plain;' http://$node_address:$node_port/)
 if [ $? -ne "0" ]; then
@@ -98,7 +104,7 @@ case $checktype in
 	"blockchain")
 		node_blocks=$(echo "$node" | jq -r '.result.blocks')
 
-		if [ $use_bch == True ]; then
+		if [ $coin == "bch" ]; then
 			remote_addr="bitcoincash.blockexplorer.com"
 		else
 			remote_addr="blockexplorer.com"
