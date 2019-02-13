@@ -14,6 +14,25 @@
 
 coin="btc" # Default to BTC if not specified
 
+function rpcGrab()
+{
+        local method=$1
+
+        nodeblock=$(curl --user $node_user:$node_pass -sf --data-binary '{"jsonrpc": "1.0", "id":"check_btc_blockchain", "method": "'${method}'", "params":[] }' -H 'content-type: text/plain;' http://$node_address:$node_port/)
+        if [ $? -ne "0" ]; then
+                echo "UNKNOWN - Request to bitcoind failed"
+                exit 3
+        fi
+
+        node_error=$(echo "$nodeblock" | jq -r '.error')
+        if [ "$node_error" != "null" ]; then
+                echo "UNKNOWN - Request to bitcoind returned error - $node_error"
+                exit 3
+        fi
+
+	echo $nodeblock
+}
+
 while getopts ":B:H:P:w:c:u:p:t:" opt; do
         case $opt in
                 B)
@@ -92,19 +111,9 @@ case $checktype in
                         exit 3
                 fi
 
-                nodeblock=$(curl --user $node_user:$node_pass -sf --data-binary '{"jsonrpc": "1.0", "id":"check_btc_blockchain", "method": "getblockchaininfo", "params":[] }' -H 'content-type: text/plain;' http://$node_address:$node_port/)
-                if [ $? -ne "0" ]; then
-                        echo "UNKNOWN - Request to bitcoind failed"
-                        exit 3
-                fi
+                grab=$(rpcGrab 'getblockchaininfo')
+                node_blocks=$(echo $grab | jq -r '.result.blocks')
 
-                node_error=$(echo "$nodeblock" | jq -r '.error')
-                if [ "$node_error" != "null" ]; then
-                        echo "UNKNOWN - Request to bitcoind returned error - $node_error"
-                        exit 3
-                fi
-
-                node_blocks=$(echo "$nodeblock" | jq -r '.result.blocks')
                 if [ $coin == "bch" ]; then
                         remote_addr="bitcoincash.blockexplorer.com"
                 else
@@ -149,19 +158,9 @@ case $checktype in
                         exit 3
                 fi
 
-                nodeconn=$(curl --user $node_user:$node_pass -sf --data-binary '{"jsonrpc": "1.0", "id":"check_btc_blockchain", "method": "getnetworkinfo", "params": [] }' -H 'content-type: text/plain;' http://$node_address:$node_port/)
-                if [ $? -ne "0" ]; then
-                        echo "UNKNOWN - Request to bitcoind failed"
-                        exit 3
-                fi
+                grab=$(rpcGrab "getnetworkinfo")
+                node_conns=$(echo $grab | jq -r '.result.connections')
 
-                node_error=$(echo "$nodeconn" | jq -r '.error')
-                if [ "$node_error" != "null" ]; then
-                        echo "UNKNOWN - Request to bitcoind returned error - $node_error"
-                        exit 3
-                fi
-
-                node_conns=$(echo "$nodeconn" | jq -r '.result.connections')
                 output="network connections = $node_conns|connections=$node_conns"
                 if [ "$node_conns" -gt "$warn_level" ]; then
                         echo "OK - $output"
@@ -179,19 +178,9 @@ case $checktype in
                 ;;
 
         "warnings")
-                nodeblock=$(curl --user $node_user:$node_pass -sf --data-binary '{"jsonrpc": "1.0", "id":"check_btc_blockchain", "method": "getnetworkinfo", "params":[] }' -H 'content-type: text/plain;' http://$node_address:$node_port/)
-                if [ $? -ne "0" ]; then
-                        echo "UNKNOWN - Request to bitcoind failed"
-                        exit 3
-                fi
+                grab=$(rpcGrab "getnetworkinfo")
+                node_warnings=$(echo $grab | jq -r '.result.warnings')
 
-                node_error=$(echo "$nodeblock" | jq -r '.error')
-                if [ "$node_error" != "null" ]; then
-                        echo "UNKNOWN - Request to bitcoind returned error - $node_error"
-                        exit 3
-                fi
-
-                node_warnings=$(echo "$nodeblock" | jq -r '.result.warnings')
                 if [ -z "$node_warnings" ]; then
                         echo "OK"
                         exit 0
