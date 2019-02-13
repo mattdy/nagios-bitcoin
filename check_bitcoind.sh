@@ -60,16 +60,6 @@ if [ -z "$node_port" ]; then
         node_port=8332
 fi
 
-if [ -z "$warn_level" ]; then
-        echo "UNKNOWN - Must specify a warning level"
-        exit 3
-fi
-
-if [ -z "$crit_level" ]; then
-        echo "UNKNOWN - Must specify a critical level"
-        exit 3
-fi
-
 if [ -z "$checktype" ]; then
         echo "UNKNOWN - Must specify a check to perform (blockchain/connections)"
         exit 3
@@ -93,6 +83,16 @@ fi
 case $checktype in
         "blockchain")
                 # Check the wallet for current blockchain height
+                if [ -z "$warn_level" ]; then
+                        echo "UNKNOWN - Must specify a warning level"
+                        exit 3
+                fi
+
+                if [ -z "$crit_level" ]; then
+                        echo "UNKNOWN - Must specify a critical level"
+                        exit 3
+                fi
+
                 nodeblock=$(curl --user $node_user:$node_pass -sf --data-binary '{"jsonrpc": "1.0", "id":"check_btc_blockchain", "method": "getblockchaininfo", "params":[] }' -H 'content-type: text/plain;' http://$node_address:$node_port/)
                 if [ $? -ne "0" ]; then
                         echo "UNKNOWN - Request to bitcoind failed"
@@ -140,6 +140,16 @@ case $checktype in
 
         "connections")
                 # Check the wallet for peer connections amount
+                if [ -z "$warn_level" ]; then
+                        echo "UNKNOWN - Must specify a warning level"
+                        exit 3
+                fi
+
+                if [ -z "$crit_level" ]; then
+                        echo "UNKNOWN - Must specify a critical level"
+                        exit 3
+                fi
+
                 nodeconn=$(curl --user $node_user:$node_pass -sf --data-binary '{"jsonrpc": "1.0", "id":"check_btc_blockchain", "method": "getnetworkinfo", "params": [] }' -H 'content-type: text/plain;' http://$node_address:$node_port/)
                 if [ $? -ne "0" ]; then
                         echo "UNKNOWN - Request to bitcoind failed"
