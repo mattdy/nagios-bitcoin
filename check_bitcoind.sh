@@ -201,4 +201,9 @@ case $checktype in
                         exit 1
                 fi
                 ;;
+
+        *)
+                echo "UNKNOWN - Invalid check type specified"
+                exit 3
+                ;;
 esac
