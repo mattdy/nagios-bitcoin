@@ -12,7 +12,6 @@
 #
 # Some inspiration from https://github.com/daniel-lucio/ethereum-nagios-plugins
 
-use_bch=False
 coin="btc" # Default to BTC if not specified
 
 while getopts ":B:H:P:w:c:u:p:t:" opt; do
