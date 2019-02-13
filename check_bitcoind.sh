@@ -93,8 +93,7 @@ fi
 case $checktype in
         "blockchain")
                 # Check the wallet for current blockchain height
-                nodeblock=$(curl --user $node_user:$node_pass -sf --data-binary '{"jsonrpc": "1.0", "id":"check_btc_blockchain", "method": "getblockchaininfo", "params":
-[] }' -H 'content-type: text/plain;' http://$node_address:$node_port/)
+                nodeblock=$(curl --user $node_user:$node_pass -sf --data-binary '{"jsonrpc": "1.0", "id":"check_btc_blockchain", "method": "getblockchaininfo", "params":[] }' -H 'content-type: text/plain;' http://$node_address:$node_port/)
                 if [ $? -ne "0" ]; then
                         echo "UNKNOWN - Request to bitcoind failed"
                         exit 3
