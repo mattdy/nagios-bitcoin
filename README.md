@@ -27,6 +27,10 @@ define command {
         command_name                   check_bitcoin_connections
 }
 
+define command {
+       command_line                   $USER1$/bitcoin/check_bitcoind.sh -u $ARG1$ -p $ARG2$ -H $HOSTADDRESS$ -P $ARG3$ -B $ARG4$ -t warnings
+       command_name                   check_bitcoin_warnings
+}
 ```
 
 ### Nagios Services
@@ -46,13 +50,20 @@ define service {
         use                            generic-service
 }
 
+define service {
+        check_command                  check_bitcoin_warnings!<USERNAME>!<PASSWORD>!<PORT>!<CURRENCY>
+        host_name                      <HOSTNAME>
+        service_description            Bitcoind Warnings
+        use                            generic-service
+}
 ```
 
 ## Service Descriptions
 Check Type | Description | Example output
 ---------- | ----------- | --------------
 blockchain | Check the height of the node blockchain against [Blockexplorer](https://blockexplorer.com) | `CRITICAL - node block height = 380882, global block height = 494377` 
-connections | Check the number of connections (peers) reported | `OK - network connections = 8``
+connections | Check the number of connections (peers) reported | `OK - network connections = 8`
+warnings | Check for any warnings on the network | `OK`
 
 ## Command line options
 Argument | Description | Example
@@ -64,4 +75,4 @@ Argument | Description | Example
 -B | Currency to use (only for blockchain check) - either `btc` or `bch` | btc
 -w | Warning level to use for Nagios output | 5
 -c | Critical level to use for Nagios output | 10
--t | Type of check to run - either `blockchain` or `connections` | blockchain
+-t | Type of check to run - either `blockchain`, `connections` or `warnings` | blockchain

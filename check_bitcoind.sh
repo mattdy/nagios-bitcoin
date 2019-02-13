@@ -178,4 +178,27 @@ case $checktype in
                         exit 3
                 fi
                 ;;
+
+        "warnings")
+                nodeblock=$(curl --user $node_user:$node_pass -sf --data-binary '{"jsonrpc": "1.0", "id":"check_btc_blockchain", "method": "getnetworkinfo", "params":[] }' -H 'content-type: text/plain;' http://$node_address:$node_port/)
+                if [ $? -ne "0" ]; then
+                        echo "UNKNOWN - Request to bitcoind failed"
+                        exit 3
+                fi
+
+                node_error=$(echo "$nodeblock" | jq -r '.error')
+                if [ "$node_error" != "null" ]; then
+                        echo "UNKNOWN - Request to bitcoind returned error - $node_error"
+                        exit 3
+                fi
+
+                node_warnings=$(echo "$nodeblock" | jq -r '.result.warnings')
+                if [ -z "$node_warnings" ]; then
+                        echo "OK"
+                        exit 0
+                else
+                        echo "CRITICAL - $node_warnings"
+                        exit 1
+                fi
+                ;;
 esac
