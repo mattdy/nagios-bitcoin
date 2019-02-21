@@ -93,11 +93,6 @@ if [ -z "$node_pass" ]; then
         exit 3
 fi
 
-if [ "$coin" != "btc" ] && [ "$coin" != "bch" ]; then
-        echo "UNKNOWN - Invalid coin type specified (btc/bch)"
-        exit 3
-fi
-
 case $checktype in
         "blockchain")
                 # Check the wallet for current blockchain height
@@ -114,21 +109,13 @@ case $checktype in
                 grab=$(rpcGrab 'getblockchaininfo')
                 node_blocks=$(echo $grab | jq -r '.result.blocks')
 
-                if [ $coin == "bch" ]; then
-                        remote_addr="bitcoincash.blockexplorer.com"
-                else
-                        remote_addr="blockexplorer.com"
-                fi
-
-                remote=$(curl -sf https://$remote_addr/api/status?q=getBlockchainInfo)
+                remote=$(curl -sf http://blockchain-api.io/v1/$coin/blocks)
                 if [ $? -ne "0" ]; then
-                        echo "UNKNOWN - Could not fetch remote information"
+                        echo "UNKNOWN - Could not fetch remote information. Response from server was: $remote"
                         exit 3
                 fi
 
-                remote_blocks=$(echo "$remote" | jq -r '.info.blocks')
-
-                diff=$(expr $remote_blocks - $node_blocks)
+                diff=$(expr $remote - $node_blocks)
                 output="node block height = $node_blocks, global block height = $remote_blocks|node=$node_blocks, global=$remote_blocks"
 
                 if [ "$diff" -lt "$warn_level" ]; then
