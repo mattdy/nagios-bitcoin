@@ -12,8 +12,6 @@
 #
 # Some inspiration from https://github.com/daniel-lucio/ethereum-nagios-plugins
 
-coin="btc" # Default to BTC if not specified
-
 function rpcGrab()
 {
         local method=$1
@@ -91,6 +89,11 @@ fi
 if [ -z "$node_pass" ]; then
         echo "UNKNOWN - No password specified"
         exit 3
+fi
+
+if [ -z "$coin" ]; then
+        # Default to BTC if no coin specified
+        coin = "btc"
 fi
 
 case $checktype in
