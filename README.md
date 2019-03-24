@@ -76,7 +76,7 @@ Check Type | Description | Example output
 blockchain | Check the height of the node blockchain against [Blockchain API](http://blockchain-api.io) | `CRITICAL - node block height = 380882, global block height = 494377` 
 connections | Check the number of connections (peers) reported | `OK - network connections = 8`
 warnings | Check for any warnings on the network | `OK`
-time | Check the difference between the current time and the last generated block | `WARNING - last block = 2504 secs ago|time=1553443646`
+time | Check the difference between the current time and the last generated block | `WARNING - last block = 2504 secs ago`
 
 ## Command line options
 Argument | Description | Example
