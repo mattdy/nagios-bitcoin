@@ -215,7 +215,7 @@ case $checktype in
                 node_warnings=$(echo $grab | jq -r '.result.warnings')
 
 		# If we have a list of warnings to ignore, then run through each one and see if it matches our warnings
-		if [ ! -z "$ignore" ] && [ -z "$node_warnings" ]; then
+		if [ ! -z "$ignore" ] && [ ! -z "$node_warnings" ]; then
 			export IFS=";"
                         for i in $ignore; do
                                 if [[ "$node_warnings" =~ "$i" ]]; then
