@@ -33,7 +33,7 @@ define command {
 }
 
 define command {
-       command_line                   $USER1$/bitcoin/check_bitcoind.sh -u $ARG1$ -p $ARG2$ -H $HOSTADDRESS$ -P $ARG3$ -B $ARG4$ -t warnings
+       command_line                   $USER1$/bitcoin/check_bitcoind.sh -u $ARG1$ -p $ARG2$ -H $HOSTADDRESS$ -P $ARG3$ -B $ARG4$ -i "$ARG5" -t warnings
        command_name                   check_bitcoin_warnings
 }
 ```
@@ -63,7 +63,7 @@ define service {
 }
 
 define service {
-        check_command                  check_bitcoin_warnings!<USERNAME>!<PASSWORD>!<PORT>!<CURRENCY>
+        check_command                  check_bitcoin_warnings!<USERNAME>!<PASSWORD>!<PORT>!<CURRENCY>!<WARNINGS>
         host_name                      <HOSTNAME>
         service_description            Bitcoind Warnings
         use                            generic-service
@@ -89,3 +89,4 @@ Argument | Description | Example
 -w | Warning level to use for Nagios output | 5
 -c | Critical level to use for Nagios output | 10
 -t | Type of check to run - either `blockchain`, `connections`, `time` or `warnings` | blockchain
+-i | Any warning messages to suppress (separated by ;) when using the `warnings` check type | `pre-release test build;Unknown block versions`
