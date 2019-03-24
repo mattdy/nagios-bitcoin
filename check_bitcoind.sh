@@ -15,8 +15,9 @@
 function rpcGrab()
 {
         local method=$1
+	local params=$2
 
-        nodeblock=$(curl --user $node_user:$node_pass -sf --data-binary '{"jsonrpc": "1.0", "id":"check_btc_blockchain", "method": "'${method}'", "params":[] }' -H 'content-type: text/plain;' http://$node_address:$node_port/)
+        nodeblock=$(curl --user $node_user:$node_pass -sf --data-binary '{"jsonrpc": "1.0", "id":"check_btc_blockchain", "method": "'${method}'", "params":['${params}'] }' -H 'content-type: text/plain;' http://$node_address:$node_port/)
         if [ $? -ne "0" ]; then
                 echo "UNKNOWN - Request to bitcoind failed"
                 exit 3
@@ -159,6 +160,45 @@ case $checktype in
                         echo "WARNING - $output"
                         exit 1
                 elif [ "$node_conns" -le "$crit_level" ]; then
+                        echo "CRITICAL - $output"
+                        exit 2
+                else
+                        echo "UNKNOWN - $output"
+                        exit 3
+                fi
+                ;;
+
+	"time")
+                if [ -z "$warn_level" ]; then
+                        echo "UNKNOWN - Must specify a warning level"
+                        exit 3
+                fi
+
+                if [ -z "$crit_level" ]; then
+                        echo "UNKNOWN - Must specify a critical level"
+                        exit 3
+                fi
+
+		# Get the current best block
+		info=$(rpcGrab "getblockchaininfo")
+		best_hash=$(echo $info | jq -r '.result.bestblockhash')
+
+		# Fetch information on that specific block to get the generated time
+		grab=$(rpcGrab "getblock" "\"$best_hash\"")
+		block_time=$(echo $grab | jq -r '.result.time')
+		current_time=$(date +%s)
+
+		diff=$(expr $current_time - $block_time)
+
+		output="last block = $diff secs ago|time=$block_time"
+
+                if [ "$diff" -lt "$warn_level" ]; then
+                        echo "OK - $output"
+                        exit 0
+                elif [ "$diff" -ge "$warn_level" ] && [ "$diff" -lt "$crit_level" ]; then
+                        echo "WARNING - $output"
+                        exit 1
+                elif [ "$diff" -ge "$crit_level" ]; then
                         echo "CRITICAL - $output"
                         exit 2
                 else
