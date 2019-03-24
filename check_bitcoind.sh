@@ -32,7 +32,7 @@ function rpcGrab()
 	echo $nodeblock
 }
 
-while getopts ":B:H:P:w:c:u:p:t:" opt; do
+while getopts ":B:H:P:w:c:u:p:t:i:" opt; do
         case $opt in
                 B)
                         coin=$OPTARG
@@ -57,6 +57,9 @@ while getopts ":B:H:P:w:c:u:p:t:" opt; do
                         ;;
                 t)
                         checktype=$OPTARG
+                        ;;
+                i)
+                        ignore=$OPTARG
                         ;;
                 \?)
                         echo "UNKNOWN - Invalid option $OPTARG" >&2
@@ -211,7 +214,17 @@ case $checktype in
                 grab=$(rpcGrab "getnetworkinfo")
                 node_warnings=$(echo $grab | jq -r '.result.warnings')
 
-                if [ -z "$node_warnings" ]; then
+		# If we have a list of warnings to ignore, then run through each one and see if it matches our warnings
+		if [ ! -z "$ignore" ] && [ -z "$node_warnings" ]; then
+			export IFS=";"
+                        for i in $ignore; do
+                                if [[ "$node_warnings" =~ "$i" ]]; then
+                                        node_warnings=""
+                                fi
+                        done
+		fi
+
+	        if [ -z "$node_warnings" ]; then
                         echo "OK"
                         exit 0
                 else
