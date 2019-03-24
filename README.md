@@ -28,6 +28,11 @@ define command {
 }
 
 define command {
+        command_line                   $USER1$/bitcoin/check_bitcoind.sh -u $ARG1$ -p $ARG2$ -H $HOSTADDRESS$ -P $ARG3$ -B $ARG4$ -w $ARG5$ -c $ARG6$ -t time
+        command_name                   check_bitcoin_time
+}
+
+define command {
        command_line                   $USER1$/bitcoin/check_bitcoind.sh -u $ARG1$ -p $ARG2$ -H $HOSTADDRESS$ -P $ARG3$ -B $ARG4$ -t warnings
        command_name                   check_bitcoin_warnings
 }
@@ -51,6 +56,13 @@ define service {
 }
 
 define service {
+        check_command                  check_bitcoin_time!<USERNAME>!<PASSWORD>!<PORT>!<CURRENCY>!<WARN>!<CRIT>
+        host_name                      <HOSTNAME>
+        service_description            Bitcoind Block Time
+        use                            generic-service
+}
+
+define service {
         check_command                  check_bitcoin_warnings!<USERNAME>!<PASSWORD>!<PORT>!<CURRENCY>
         host_name                      <HOSTNAME>
         service_description            Bitcoind Warnings
@@ -64,6 +76,7 @@ Check Type | Description | Example output
 blockchain | Check the height of the node blockchain against [Blockexplorer](https://blockexplorer.com) | `CRITICAL - node block height = 380882, global block height = 494377` 
 connections | Check the number of connections (peers) reported | `OK - network connections = 8`
 warnings | Check for any warnings on the network | `OK`
+time | Check the difference between the current time and the last generated block | `WARNING - last block = 2504 secs ago|time=1553443646`
 
 ## Command line options
 Argument | Description | Example
@@ -75,4 +88,4 @@ Argument | Description | Example
 -B | Currency to use (only for blockchain check) - either `btc` or `bch` | btc
 -w | Warning level to use for Nagios output | 5
 -c | Critical level to use for Nagios output | 10
--t | Type of check to run - either `blockchain`, `connections` or `warnings` | blockchain
+-t | Type of check to run - either `blockchain`, `connections`, `time` or `warnings` | blockchain
