@@ -1,5 +1,5 @@
 # nagios-bitcoin
-Nagios plugin to monitor bitcoind, to allow escalation of alerts when problems are sensed. Can be used on either the BTC or BCH networks as specified.
+Nagios plugin to monitor bitcoind, to allow escalation of alerts when problems are sensed. Can be used on any Bitcoin variant network.
 
 ## Requirements
 - A [Nagios](https://www.nagios.org/) installation
