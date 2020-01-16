@@ -73,7 +73,7 @@ define service {
 ## Service Descriptions
 Check Type | Description | Example output
 ---------- | ----------- | --------------
-blockchain | Check the height of the node blockchain against [Blockchain API](http://blockchain-api.io) | `CRITICAL - node block height = 380882, global block height = 494377` 
+blockchain | Check the height of the node blockchain against remote APIs | `CRITICAL - node block height = 380882, global block height = 494377` 
 connections | Check the number of connections (peers) reported | `OK - network connections = 8`
 warnings | Check for any warnings on the network | `OK`
 time | Check the difference between the current time and the last generated block | `WARNING - last block = 2504 secs ago`
@@ -85,7 +85,7 @@ Argument | Description | Example
 -p | RPC password | rpcpass
 -H | RPC host | localhost
 -P | RPC port | 8332
--B | Currency to use (only for blockchain check - any not supported by [Blockchain API](http://blockchain-api.io) will trigger an alert) | btc
+-B | Currency to use (only for blockchain check - any not supported will trigger an alert) | btc
 -w | Warning level to use for Nagios output | 5
 -c | Critical level to use for Nagios output | 10
 -t | Type of check to run - either `blockchain`, `connections`, `time` or `warnings` | blockchain

@@ -7,7 +7,7 @@
 # updated by Louis - 2018-09-22
 # github.com/louiseth1/nagios-bitcoin
 #
-# Nagios plugin to check the given Bitcoin node against blockexplorer.com
+# Nagios plugin to check the given Bitcoin node
 # Can be used on BTC or BCH nodes as specified
 #
 # Some inspiration from https://github.com/daniel-lucio/ethereum-nagios-plugins
