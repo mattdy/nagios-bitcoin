@@ -116,14 +116,42 @@ case $checktype in
                 grab=$(rpcGrab 'getblockchaininfo')
                 node_blocks=$(echo $grab | jq -r '.result.blocks')
 
-                remote=$(curl -sf http://blockchain-api.io/v1/$coin/blocks)
+		case $coin in
+			"btc")
+				address="https://api.blockchair.com/bitcoin/stats"
+				path=".data.blocks"
+			;;
+
+			"bsv")
+				address="https://api.blockchair.com/bitcoin-sv/stats"
+				path=".data.blocks"
+			;;
+
+			"bch")
+				address="https://api.blockchair.com/bitcoin-cash/stats"
+				path=".data.blocks"
+			;;
+
+			"btg")
+				address="https://explorer.bitcoingold.org/insight-api/status?q=getInfo"
+				path=".info.blocks"
+			;;
+
+			*)
+				echo "UNKNOWN - unknown coin type requested. Select one of btc/bsv/bch/btg"
+				exit 3
+			;;
+		esac
+
+                remote=$(curl -sf $address)
                 if [ $? -ne "0" ]; then
-                        echo "UNKNOWN - Could not fetch remote information. Response from server was: $remote"
+                        echo "UNKNOWN - Could not fetch remote information (from $address). Response from server was: $remote"
                         exit 3
                 fi
+		remote_blocks=$(echo $remote | jq -r "$path")
 
-                diff=$(expr $remote - $node_blocks)
-                output="node block height = $node_blocks, global block height = $remote|node=$node_blocks, global=$remote"
+                diff=$(expr $remote_blocks - $node_blocks)
+                output="node block height = $node_blocks, global block height = $remote_blocks|node=$node_blocks, global=$remote_blocks"
 
                 if [ "$diff" -lt "$warn_level" ]; then
                         echo "OK - $output"
