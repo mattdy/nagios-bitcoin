@@ -143,7 +143,7 @@ case $checktype in
 			;;
 		esac
 
-                remote=$(curl -sf $address)
+                remote=$(curl -sfk $address)
                 if [ $? -ne "0" ]; then
                         echo "UNKNOWN - Could not fetch remote information (from $address). Response from server was: $remote"
                         exit 3
